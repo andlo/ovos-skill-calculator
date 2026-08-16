@@ -1,0 +1,21 @@
+{
+  "skill_id": "ovos-skill-calculator.andlo",
+  "source": "https://github.com/andlo/ovos-skill-calculator",
+  "package_name": "ovos-skill-calculator",
+  "pip_spec": "ovos-skill-calculator",
+  "license": "GPL-3.0-or-later",
+  "author": "andlo",
+  "name": "Lommeregner",
+  "description": "En basal lommeregner - plus, minus, gange, dividere, procent, kvadrat, kvadratrod. Fuldstændig offline.",
+  "examples": [
+    "hvad er 15 gange 23",
+    "hvad er kvadratroden af 144",
+    "hvad er 20 procent af 150"
+  ],
+  "tags": [
+    "lommeregner",
+    "matematik",
+    "regning"
+  ],
+  "icon": "https://raw.githubusercontent.com/andlo/ovos-skill-calculator/main/icon.png"
+}
