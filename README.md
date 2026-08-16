@@ -31,17 +31,16 @@ anchor-word pattern every other intent in this project family uses
 (e.g. `ovos-skill-convert`'s `"convert {value} {from_unit} to
 {to_unit}"`).
 
-## A rough edge fixed here (not yet back-ported elsewhere)
+## A rough edge fixed here (tracked as an issue elsewhere)
 
-`ovos-skill-convert`, `ovos-skill-tuning-fork`, and
-`ovos-skill-rhythm-box` all documented a cosmetic issue: whole-number
-results spoken with a trailing ".0" (e.g. "10.0" instead of "10"),
-because Python's default float formatting was used as-is. This skill
-fixes it with a small `_format_number()` helper - a whole-number
-float speaks as a plain integer, a genuine fraction rounds to 4
-decimal places. Worth porting the same helper to the other skills
-later; not done retroactively here to keep this change scoped to a
-new skill rather than touching several existing ones at once.
+[ovos-skill-convert](https://github.com/andlo/ovos-skill-convert)
+has an open issue for a cosmetic rough edge: whole-number results
+spoken with a trailing ".0" (e.g. "10.0" instead of "10"), because
+Python's default float formatting was used as-is. This skill avoids
+the problem from the start with a small `_format_number()` helper - a
+whole-number float speaks as a plain integer, a genuine fraction
+rounds to 4 decimal places. Worth porting the same helper over when
+that issue is picked up.
 
 ## Install
 ```bash
