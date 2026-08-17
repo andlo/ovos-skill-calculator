@@ -47,9 +47,10 @@ not done retroactively here to keep this change scoped.
 """
 
 import math
+import re
 
 from ovos_workshop.skills import OVOSSkill
-from ovos_workshop.decorators import intent_handler
+from ovos_workshop.decorators import intent_handler, common_query
 from ovos_number_parser import extract_number
 
 DECIMAL_PLACES = 4
@@ -65,7 +66,115 @@ def _format_number(value):
     return value
 
 
+# ---------------------------------------------------------------
+# Common Query safety net - see ovos-skill-geometry/ovos-skill-geography's
+# DEVELOPMENT.md "Common Query as a safety net, not a replacement":
+# live testing found a platform-level semantic router
+# (ovos-m2v-pipeline-high) can intercept a "what is X" utterance
+# before this skill's own Padatious intent gets a chance, on
+# installations where pipeline confidence tuning differs from ours -
+# a skill can't ship or control that per-instance config, so Common
+# Query participation is the portable fallback. "What is {a} times
+# {b}" is a strong candidate for this specific misrouting (same
+# "what is X" shape as the confirmed cases), unlike this project
+# family's imperative "quiz me on X" skills, which aren't phrased as
+# questions at all.
+#
+# Regex, not fuzzy NLU - the anchor words (plus/minus/times/...) are
+# LITERAL in every locale's own intent files (see the module
+# docstring above for why: padatious itself can't disambiguate three
+# consecutive wildcards without a literal anchor between them). The
+# same anchor words are reused here as regex groups splitting on that
+# literal text - a safety net for cases the platform's own routing
+# failed to hand us properly, not a second implementation of intent
+# parsing.
+CALC_PATTERNS = {
+    "en-us": [
+        (re.compile(r"^what(?:'s| is) (.+) plus (.+)$", re.I), "add"),
+        (re.compile(r"^what(?:'s| is) (.+) and (.+)$", re.I), "add"),
+        (re.compile(r"^what(?:'s| is) (.+) minus (.+)$", re.I), "subtract"),
+        (re.compile(r"^what(?:'s| is) (.+) multiplied by (.+)$", re.I), "multiply"),
+        (re.compile(r"^what(?:'s| is) (.+) times (.+)$", re.I), "multiply"),
+        (re.compile(r"^what(?:'s| is) (.+) divided by (.+)$", re.I), "divide"),
+        (re.compile(r"^what(?:'s| is) (.+) percent of (.+)$", re.I), "percentage"),
+        (re.compile(r"^what(?:'s| is) (.+) squared$", re.I), "square"),
+        (re.compile(r"^what(?:'s| is) the square root of (.+)$", re.I), "square_root"),
+    ],
+    "da-dk": [
+        (re.compile(r"^hvad er (.+) plus (.+)$", re.I), "add"),
+        (re.compile(r"^hvad er (.+) minus (.+)$", re.I), "subtract"),
+        (re.compile(r"^hvad er (.+) ganget med (.+)$", re.I), "multiply"),
+        (re.compile(r"^hvad er (.+) gange (.+)$", re.I), "multiply"),
+        (re.compile(r"^hvad er (.+) divideret med (.+)$", re.I), "divide"),
+        (re.compile(r"^hvad er (.+) delt med (.+)$", re.I), "divide"),
+        (re.compile(r"^hvad er (.+) procent af (.+)$", re.I), "percentage"),
+        (re.compile(r"^hvad er (.+) i anden$", re.I), "square"),
+        (re.compile(r"^hvad er kvadratroden af (.+)$", re.I), "square_root"),
+    ],
+}
+
+
+def _compute(operation, a, b=None):
+    if operation == "add":
+        return a + b
+    if operation == "subtract":
+        return a - b
+    if operation == "multiply":
+        return a * b
+    if operation == "divide":
+        return None if b == 0 else a / b
+    if operation == "percentage":
+        return a / 100 * b
+    if operation == "square":
+        return a ** 2
+    if operation == "square_root":
+        return None if a < 0 else math.sqrt(a)
+    return None
+
+
+def _safe_extract_number(raw, lang):
+    """extract_number() returns False for unparseable text, but
+    raises NotImplementedError for a language it has no support for
+    at all - caught here so an unrecognized language degrades to "no
+    match" (None) rather than crashing the whole Common Query flow."""
+    try:
+        return extract_number(raw, lang=lang)
+    except NotImplementedError:
+        return False
+
+
 class Calculator(OVOSSkill):
+
+    @common_query()
+    def handle_common_query(self, phrase, lang):
+        """Safety net - see CALC_PATTERNS above. Tries every known
+        pattern for this language; the single-operand ones (square,
+        square_root) only ever populate group 1, never group 2."""
+        lang = lang.lower()
+        if lang not in CALC_PATTERNS:
+            lang = "en-us"  # both the regex patterns AND number
+            # extraction fall back together - using en-us patterns
+            # with a different lang's number words would just fail
+        patterns = CALC_PATTERNS[lang]
+        stripped = phrase.strip().rstrip("?").strip()
+        for pattern, operation in patterns:
+            m = pattern.match(stripped)
+            if not m:
+                continue
+            groups = m.groups()
+            a = _safe_extract_number(groups[0], lang)
+            if a is False or a is None:
+                return None
+            b = None
+            if len(groups) > 1:
+                b = _safe_extract_number(groups[1], lang)
+                if b is False or b is None:
+                    return None
+            result = _compute(operation, a, b)
+            if result is None:
+                return None
+            return str(_format_number(result)), 0.8
+        return None
 
     def _parse_two_numbers(self, message):
         """Shared by add/subtract/multiply/divide/percentage - all

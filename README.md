@@ -42,6 +42,19 @@ whole-number float speaks as a plain integer, a genuine fraction
 rounds to 4 decimal places. Worth porting the same helper over when
 that issue is picked up.
 
+## Common Query safety net
+
+`"what is 5 times 6"` is structurally identical to the "what is X"
+questions confirmed to sometimes get intercepted by a platform-level
+semantic router (`ovos-m2v-pipeline-high`) before this skill's own
+Padatious intents get a chance - see
+[ovos-skill-geometry](https://github.com/andlo/ovos-skill-geometry)'s
+DEVELOPMENT.md for the full live-tested finding. `handle_common_query()`
+reuses the exact literal anchor words each intent file already has
+(plus/minus/times/...) as regex patterns, so it's not a second
+implementation of the arithmetic parsing, just a fallback entry point
+into it.
+
 ## Install
 ```bash
 pip install ovos-skill-calculator
