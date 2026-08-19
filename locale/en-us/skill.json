@@ -15,7 +15,8 @@
   "tags": [
     "calculator",
     "math",
-    "arithmetic"
+    "arithmetic",
+    "utility"
   ],
   "icon": "https://raw.githubusercontent.com/andlo/ovos-skill-calculator/main/icon.png"
 }
