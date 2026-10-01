@@ -42,7 +42,7 @@ jobs:
 
   # The tag becomes a GitHub release too, with the built files attached and
   # notes listing the merged PRs. A release written by hand first (gh release
-  # create, which also pushes the tag) is left as it is.
+  # create, which also pushes the tag) keeps its notes; the files are attached.
   github-release:
     needs: publish
     runs-on: ubuntu-latest
