@@ -1,0 +1,9 @@
+{"utterance": "hvad er 12 plus 4", "lang": "da-DK", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "add"}
+{"utterance": "hvad er 7 divideret med 15", "lang": "da-DK", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "divide"}
+{"utterance": "hvad er 250 delt med 8", "lang": "da-DK", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "divide"}
+{"utterance": "hvad er 3,5 gange 2", "lang": "da-DK", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "multiply"}
+{"utterance": "hvad er 99 ganget med 11", "lang": "da-DK", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "multiply"}
+{"utterance": "hvad er 12 procent af 4", "lang": "da-DK", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "percentage"}
+{"utterance": "hvad er 7 i anden", "lang": "da-DK", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "square"}
+{"utterance": "hvad er kvadratroden af 250", "lang": "da-DK", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "square_root"}
+{"utterance": "hvad er 3,5 minus 15", "lang": "da-DK", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "subtract"}

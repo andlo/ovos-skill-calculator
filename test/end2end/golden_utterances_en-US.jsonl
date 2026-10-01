@@ -1,0 +1,16 @@
+{"utterance": "what is 12 plus 4", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "add"}
+{"utterance": "what's 7 plus 15", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "add"}
+{"utterance": "what is 250 and 8", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "add"}
+{"utterance": "what is 3.5 divided by 2", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "divide"}
+{"utterance": "what's 99 divided by 11", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "divide"}
+{"utterance": "what is 12 times 4", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "multiply"}
+{"utterance": "what's 7 times 15", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "multiply"}
+{"utterance": "what is 250 multiplied by 8", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "multiply"}
+{"utterance": "what is 3.5 percent of 2", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "percentage"}
+{"utterance": "what's 99 percent of 11", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "percentage"}
+{"utterance": "what is 12 squared", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "square"}
+{"utterance": "what's 7 squared", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "square"}
+{"utterance": "what is the square root of 250", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "square_root"}
+{"utterance": "what's the square root of 3.5", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "square_root"}
+{"utterance": "what is 99 minus 4", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "subtract"}
+{"utterance": "what's 12 minus 15", "lang": "en-US", "skill_id": "ovos-skill-calculator.andlo", "intent_label": "subtract"}
