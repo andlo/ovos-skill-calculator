@@ -3,7 +3,7 @@ skill OVOS Calculator
 
 A basic calculator - "what is 15 times 23", "what is the square root
 of 144", "what is 20 percent of 150". Fully offline, pure arithmetic,
-no external dependencies beyond number parsing.
+no external dependencies beyond number reading (numtag).
 
 ONE INTENT FILE PER OPERATION, NOT A SHARED {operator} WILDCARD
 -------------------------------------------------------------------
@@ -32,10 +32,11 @@ not done retroactively here to keep this change scoped.
 
 import math
 import re
+from fractions import Fraction
 
+from numtag import Reason, UnsupportedLanguageError, tag_numbers
 from ovos_workshop.skills import OVOSSkill
 from ovos_workshop.decorators import intent_handler, common_query
-from ovos_number_parser import extract_number
 
 DECIMAL_PLACES = 4
 
@@ -43,6 +44,10 @@ DECIMAL_PLACES = 4
 def _format_number(value):
     """Whole numbers speak as plain integers ('10', not '10.0');
     genuine fractions are rounded to DECIMAL_PLACES."""
+    if isinstance(value, Fraction):
+        if value.denominator == 1:
+            return int(value)
+        value = float(value)
     if isinstance(value, float) and value.is_integer():
         return int(value)
     if isinstance(value, float):
@@ -116,15 +121,24 @@ def _compute(operation, a, b=None):
     return None
 
 
-def _safe_extract_number(raw, lang):
-    """extract_number() returns False for unparseable text, but
-    raises NotImplementedError for a language it has no support for
-    at all - caught here so an unrecognized language degrades to "no
-    match" (None) rather than crashing the whole Common Query flow."""
+def _read_number(raw, lang):
+    """The number in a slot as an exact Fraction, or None.
+
+    numtag reads digits in the language's own notation ('3,5' in
+    Danish, '3.5' in English) and spoken numbers ('fifteen',
+    'femogtyve', 'two and a half'), so the arithmetic below stays
+    exact ('0.1 plus 0.2' is 0.3). A lone article ('en', 'a') counts
+    as 1 only when the slot holds no other number. A language numtag
+    has no lexicon for reads no number, so it degrades to "no match"
+    instead of crashing the handler or the Common Query flow."""
+    if not raw:
+        return None
     try:
-        return extract_number(raw, lang=lang)
-    except NotImplementedError:
-        return False
+        mentions = tag_numbers(str(raw), lang)
+    except UnsupportedLanguageError:
+        return None
+    numbers = [m for m in mentions if Reason.ARTICLE not in m.reasons] or mentions
+    return Fraction(numbers[0].value) if numbers else None
 
 
 class Calculator(OVOSSkill):
@@ -146,13 +160,13 @@ class Calculator(OVOSSkill):
             if not m:
                 continue
             groups = m.groups()
-            a = _safe_extract_number(groups[0], lang)
-            if a is False or a is None:
+            a = _read_number(groups[0], lang)
+            if a is None:
                 return None
             b = None
             if len(groups) > 1:
-                b = _safe_extract_number(groups[1], lang)
-                if b is False or b is None:
+                b = _read_number(groups[1], lang)
+                if b is None:
                     return None
             result = _compute(operation, a, b)
             if result is None:
@@ -164,11 +178,9 @@ class Calculator(OVOSSkill):
         """Shared by add/subtract/multiply/divide/percentage - all
         take an {a} and a {b} slot. Returns (a, b) or (None, None) if
         either failed to parse."""
-        a_raw = message.data.get("a")
-        b_raw = message.data.get("b")
-        a = extract_number(a_raw, lang=self.lang) if a_raw else None
-        b = extract_number(b_raw, lang=self.lang) if b_raw else None
-        if a is False or a is None or b is False or b is None:
+        a = _read_number(message.data.get("a"), self.lang)
+        b = _read_number(message.data.get("b"), self.lang)
+        if a is None or b is None:
             return None, None
         return a, b
 
@@ -220,18 +232,16 @@ class Calculator(OVOSSkill):
 
     @intent_handler("square.intent")
     def handle_square(self, message):
-        a_raw = message.data.get("a")
-        a = extract_number(a_raw, lang=self.lang) if a_raw else None
-        if a is False or a is None:
+        a = _read_number(message.data.get("a"), self.lang)
+        if a is None:
             self.speak_dialog("numbers_not_understood")
             return
         self._speak_result(a ** 2)
 
     @intent_handler("square_root.intent")
     def handle_square_root(self, message):
-        a_raw = message.data.get("a")
-        a = extract_number(a_raw, lang=self.lang) if a_raw else None
-        if a is False or a is None:
+        a = _read_number(message.data.get("a"), self.lang)
+        if a is None:
             self.speak_dialog("numbers_not_understood")
             return
         if a < 0:
