@@ -3,7 +3,7 @@
   "source": "https://github.com/andlo/ovos-skill-calculator",
   "package_name": "ovos-skill-calculator",
   "pip_spec": "ovos-skill-calculator",
-  "license": "GPL-3.0-or-later",
+  "license": "Apache-2.0",
   "author": "andlo",
   "name": "Lommeregner",
   "description": "En basal lommeregner - plus, minus, gange, dividere, procent, kvadrat, kvadratrod. Fuldstændig offline.",

@@ -55,6 +55,6 @@ tagged release).
 
 ## Style / conventions
 
-- License: GPL-3.0-or-later (matches the other `andlo` skill repos).
+- License: Apache-2.0 (matches the other `andlo` skill repos).
 - `locale/<lang-code>/` layout, `skill.json` inside each locale folder.
 - Present design changes for review before implementing.
